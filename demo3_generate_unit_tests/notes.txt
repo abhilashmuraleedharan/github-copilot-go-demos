@@ -1,0 +1,27 @@
+Bad Prompt:
+=============
+Generate unit test cases for this code.
+
+Good Prompt:
+=============
+Context:
+I have an IsValidEmail function in emailutils/email_utils.go that checks if an email address is valid.
+
+Instruction:
+Write a Go test file named email_utils_test.go to test the IsValidEmail function.
+
+Constraints:
+ - Include at least 3 valid email test cases and 3 invalid ones.
+ - Include an edge case with a sub-domain (e.g., user@mail.example.com).
+ - Use Go's built-in testing package and table-driven tests.
+ - Keep assertions readable and beginner-friendly.
+
+Persona:
+Act as a senior Go developer writing beginner-friendly tests.
+
+Style:
+Write idiomatic Go test code; clean, readable, and well-commented.
+
+
+To run test:
+go test .\emailutils\ -v
