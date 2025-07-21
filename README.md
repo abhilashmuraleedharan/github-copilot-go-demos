@@ -1,7 +1,7 @@
 # GitHub Copilot Go Demos 🧠🚀
 
 A curated set of demos showcasing how to use [GitHub Copilot](https://github.com/features/copilot) effectively in Go projects.  
-These examples are designed for internal team training and demonstrate real-world use cases across development, refactoring, testing, documentation, and debugging.
+These examples are designed for training purposes and demonstrate real-world use cases across development, refactoring, testing, documentation, and debugging.
 
 ---
 
@@ -22,9 +22,9 @@ These examples are designed for internal team training and demonstrate real-worl
 ## 🧪 Getting Started
 
 ```bash
-git clone https://github.com/<your-username>/github-copilot-go-demos.git
+git clone https://github.com/abhilashmuraleedharan/github-copilot-go-demos.git
 cd github-copilot-go-demos
-go mod init github.com/<your-username>/copilotdemos
+go mod init github.com/abhilashmuraleedharan/copilotdemos
 ```
 
 You can run individual demos using:
@@ -32,14 +32,6 @@ You can run individual demos using:
 cd demo1_refactor_function
 go run main.go
 ```
-
----
-
-## 🖥️ Training Material
-
-The slide deck used for internal training is included:
-
-- `github-copilot-go-demos.pptx`: Walkthrough of all 7 demos with speaker notes
 
 ---
 
