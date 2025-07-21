@@ -1,0 +1,24 @@
+Bad Prompt:
+============
+Convert this Python Code to Go Code
+
+Good Prompt:
+============
+Context:
+I have a Python class BankAccount in bank_account.py that simulates a simple checking account
+with deposit and withdraw methods. I want to convert it into idiomatic Go code.
+
+Instruction:
+Convert this Python class into a Go struct with appropriate methods.
+
+Constraints:
+- Use proper Go struct with private fields.
+- Return errors instead of raising exceptions.
+- Maintain similar method behavior: Deposit, Withdraw, and String representation.
+- Method names should be exported (capitalized) and follow Go idioms.
+
+// Persona:
+Act as a senior Go developer.
+
+// Style:
+Follow idiomatic Go practices and add GoDoc-style comments for exported methods.
