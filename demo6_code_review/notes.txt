@@ -1,0 +1,20 @@
+Goal: 
+1. Show how Copilot can assist in mentoring juniors by reviewing for:
+* Logic bugs
+* Readability issues
+* Slicing pitfalls
+
+2. Show usage of /doc
+
+Prompt: 
+Review this Go file for logic errors, poor naming, and missing error handling.
+Offer actionable, constructive suggestions that can help a junior Go developer learn.
+Prioritize identifying:
+- Potential bugs or edge cases
+- Inconsistent naming conventions
+- Readability improvements
+- Missing or incorrect error handling
+Tone: Professional, supportive, and mentoring
+
+TakeAway:
+This isn’t just about catching bugs — it’s about building habits, writing safe code, and thinking like a reviewer.
