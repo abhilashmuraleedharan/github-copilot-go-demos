@@ -1,0 +1,22 @@
+Goal:
+========
+To showcase how to use GitHub Copilot's `/new` slash command to bootstrap an entire Go web service from scratch.
+
+Prompt:
+========
+/new
+
+Create a complete Go web API service called `bookapi` to manage books in a library.
+
+Requirements:
+- Use idiomatic Go and standard packages (net/http)
+- Provide REST endpoints: GET /books, POST /books, GET /books/{id}, PUT /books/{id}, DELETE /books/{id}
+- Store books in an in-memory map or slice
+- Include a README.md with build/run instructions
+- Add unit tests in a `_test.go` file
+- Use conventional Go folder structure
+
+---------
+
+Note:
+You can then use `/doc`, `/tests`, and `/fix` inside each file to build out functionality.
