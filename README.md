@@ -15,7 +15,7 @@ These examples are designed for training purposes and demonstrate real-world use
 | **Demo 4** | Identify and fix infinite loop (RCA) |
 | **Demo 5** | Refactor monolithic function into helpers |
 | **Demo 6** | Use Copilot for code review & mentoring |
-| **Demo 7** | Use `/doc` & `@workspace` for documentation and project context |
+| **Demo 7** | Use `/new` to scaffold a Go web API project from scratch |
 
 ---
 
