@@ -1,0 +1,12 @@
+Prompt:
+===========
+Context: [Optional. Add context using #selection or active editor file]
+I have a Go function called ProcessTranscript in main.go that returns a word-count mapping for a chat transcript.
+
+Instruction:
+Refactor this function into the following helpers:
+• cleanText(line string) string
+• countTokens(tokens []string, counts map[string]int)
+
+Constraints:
+Keep the core behavior and output unchanged.
