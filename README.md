@@ -19,31 +19,6 @@ These examples are designed for training purposes and demonstrate real-world use
 
 ---
 
-## 🧪 Getting Started
-
-```bash
-git clone https://github.com/abhilashmuraleedharan/github-copilot-go-demos.git
-cd github-copilot-go-demos
-go mod init github.com/abhilashmuraleedharan/copilotdemos
-```
-
-You can run individual demos using:
-```bash
-cd demo1_refactor_function
-go run main.go
-```
-
----
-
-## 🧑‍🏫 Tips for Using Copilot in Go
-
-- Use clear and focused comments to guide suggestions
-- Prefer `/doc` for function-level documentation
-- Use `@workspace` to leverage project-wide context
-- Apply the 4 S’s of prompting: **Single**, **Specific**, **Short**, **Surround**
-
----
-
 ## 🪪 License
 
 [MIT License](LICENSE)
