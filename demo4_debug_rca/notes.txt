@@ -2,3 +2,10 @@ Good Prompt:
 ===============
 Identify the loop causing the infinite iteration and propose a fix.
 Explain the root cause in one paragraph.
+
+
+Also explore various other ways of fixing and finding RCA.
+a) Click on star icon and opt fix using copilot
+b) /fix command
+
+Talk about like/dislike suggestion option.
