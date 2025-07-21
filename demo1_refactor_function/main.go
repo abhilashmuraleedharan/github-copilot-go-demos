@@ -1,19 +1,29 @@
-package fileutil
+package main
 
 import (
-    "bufio"
-    "os"
+	"demo1_refactor_function/fileutil"
+	"fmt"
 )
 
-func ReadLines(path string) []string {
-    file, _ := os.Open(path)
-    defer file.Close()
+func main() {
+	fmt.Println("===> Testing original ReadLines (no error handling):")
+	lines := fileutil.ReadLines("sample.txt")
+	fmt.Println("Output:", lines)
 
-    var lines []string
-    scanner := bufio.NewScanner(file)
-    for scanner.Scan() {
-        lines = append(lines, scanner.Text())
-    }
+	// fmt.Println("\n===> Testing improved ReadLinesSafe (with error handling):")
+	// linesSafe, err := fileutil.ReadLinesSafe("sample.txt")
+	// if err != nil {
+	// 	fmt.Println("Handled error:", err)
+	// }
+	// fmt.Println("Output:", linesSafe)
 
-    return lines
+	// fmt.Println("\n===> Testing ReadLinesSafe with non-existent file:")
+	// _, err = fileutil.ReadLinesSafe("nonexistent.txt")
+	// if err != nil {
+	// 	fmt.Println("Handled error:", err)
+	// } else {
+	// 	fmt.Println("Returned empty slice as expected.")
+	// }
+
+	fmt.Println("\n===> Done.")
 }

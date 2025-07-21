@@ -1,0 +1,23 @@
+Bad Prompt:
+==========
+Add proper exception handling to this function.
+
+Good Prompt:
+==========
+Context:
+I have a Go function ReadLines that reads lines from a text file,
+but it lacks proper error handling and does not deal with file-not-found or permission issues.
+
+Instruction:
+Refactor this function to handle file-not-found and permission errors robustly.
+
+Constraints:
+- Must return an empty slice if the file is not found.
+- Must wrap permission errors with additional context and return it.
+- Write the refactored version to a new function named `ReadLinesSafe` in the same file.
+
+Persona:
+Act as a senior Go developer.
+
+Style:
+Use idiomatic Go conventions; add doc comments that follow GoDoc style.
