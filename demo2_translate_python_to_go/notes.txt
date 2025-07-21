@@ -22,3 +22,8 @@ Act as a senior Go developer.
 
 // Style:
 Follow idiomatic Go practices and add GoDoc-style comments for exported methods.
+
+----------
+
+TakeAway:
+Copilot can understand language features and convert them correctly when given proper context.

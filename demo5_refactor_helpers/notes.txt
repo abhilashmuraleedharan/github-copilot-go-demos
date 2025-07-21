@@ -10,3 +10,11 @@ Refactor this function into the following helpers:
 
 Constraints:
 Keep the core behavior and output unchanged.
+
+------------
+
+TakeAway: Saw how we can refactor a long function into logical sub-functions using a natural prompt.
+Benefits:
+* Clear separation of concerns.
+* Better readability and testability.
+* No change in behavior or output—only structure improved.
