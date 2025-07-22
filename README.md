@@ -16,6 +16,7 @@ These examples are designed for training purposes and demonstrate real-world use
 | **Demo 5** | Refactor monolithic function into helpers |
 | **Demo 6** | Use Copilot for code review & mentoring |
 | **Demo 7** | Use `/new` to scaffold a Go web API project from scratch |
+| **Demo 8** | Analyze telecom system specification for CDR Transformation Microservice and collaborate with Copilot to extract requirements, design modules, and define interfaces |
 
 ---
 
