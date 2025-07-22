@@ -47,6 +47,6 @@ For each stage, you’ll find the recommended mode and sample prompts.
 
 **Demo Prompts:**
 - `Implement the CDR Enricher module, wire it into the service main, and create a test file for it.`
-- `Add a REST endpoint for audit logs, generate OpenAPI docs, and open a pull request.`
+- `Add a REST endpoint for audit logs, generate OpenAPI docs, and generate a changelog.md file summarizing all the changes made.`
 
 ---
