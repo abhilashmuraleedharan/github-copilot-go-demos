@@ -1,0 +1,367 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "school-management.fullname" . }}-api-gateway
+  namespace: {{ .Values.namespace }}
+  labels:
+    app.kubernetes.io/component: api-gateway
+    {{- include "school-management.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.apiGateway.replicaCount }}
+  selector:
+    matchLabels:
+      app.kubernetes.io/component: api-gateway
+      {{- include "school-management.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/component: api-gateway
+        {{- include "school-management.selectorLabels" . | nindent 8 }}
+    spec:
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+        - name: api-gateway
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: {{ include "school-management.apiGatewayImage" . }}
+          imagePullPolicy: {{ .Values.apiGateway.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: 8080
+              protocol: TCP
+          env:
+            - name: COUCHBASE_HOST
+              value: {{ .Values.couchbase.host | quote }}
+            - name: COUCHBASE_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "school-management.fullname" . }}-couchbase-secret
+                  key: username
+            - name: COUCHBASE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "school-management.fullname" . }}-couchbase-secret
+                  key: password
+            - name: STUDENT_SERVICE_URL
+              value: "http://{{ include "school-management.fullname" . }}-student-service:8081"
+            - name: TEACHER_SERVICE_URL
+              value: "http://{{ include "school-management.fullname" . }}-teacher-service:8082"
+            - name: ACADEMIC_SERVICE_URL
+              value: "http://{{ include "school-management.fullname" . }}-academic-service:8083"
+            - name: ACHIEVEMENT_SERVICE_URL
+              value: "http://{{ include "school-management.fullname" . }}-achievement-service:8084"
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: http
+            initialDelaySeconds: 30
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: http
+            initialDelaySeconds: 5
+            periodSeconds: 5
+          resources:
+            {{- toYaml .Values.apiGateway.resources | nindent 12 }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "school-management.fullname" . }}-student-service
+  namespace: {{ .Values.namespace }}
+  labels:
+    app.kubernetes.io/component: student-service
+    {{- include "school-management.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.studentService.replicaCount }}
+  selector:
+    matchLabels:
+      app.kubernetes.io/component: student-service
+      {{- include "school-management.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/component: student-service
+        {{- include "school-management.selectorLabels" . | nindent 8 }}
+    spec:
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+        - name: student-service
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: {{ include "school-management.studentServiceImage" . }}
+          imagePullPolicy: {{ .Values.studentService.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: 8081
+              protocol: TCP
+          env:
+            - name: COUCHBASE_HOST
+              value: {{ .Values.couchbase.host | quote }}
+            - name: COUCHBASE_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "school-management.fullname" . }}-couchbase-secret
+                  key: username
+            - name: COUCHBASE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "school-management.fullname" . }}-couchbase-secret
+                  key: password
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: http
+            initialDelaySeconds: 30
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: http
+            initialDelaySeconds: 5
+            periodSeconds: 5
+          resources:
+            {{- toYaml .Values.studentService.resources | nindent 12 }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "school-management.fullname" . }}-teacher-service
+  namespace: {{ .Values.namespace }}
+  labels:
+    app.kubernetes.io/component: teacher-service
+    {{- include "school-management.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.teacherService.replicaCount }}
+  selector:
+    matchLabels:
+      app.kubernetes.io/component: teacher-service
+      {{- include "school-management.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/component: teacher-service
+        {{- include "school-management.selectorLabels" . | nindent 8 }}
+    spec:
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+        - name: teacher-service
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: {{ include "school-management.teacherServiceImage" . }}
+          imagePullPolicy: {{ .Values.teacherService.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: 8082
+              protocol: TCP
+          env:
+            - name: COUCHBASE_HOST
+              value: {{ .Values.couchbase.host | quote }}
+            - name: COUCHBASE_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "school-management.fullname" . }}-couchbase-secret
+                  key: username
+            - name: COUCHBASE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "school-management.fullname" . }}-couchbase-secret
+                  key: password
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: http
+            initialDelaySeconds: 30
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: http
+            initialDelaySeconds: 5
+            periodSeconds: 5
+          resources:
+            {{- toYaml .Values.teacherService.resources | nindent 12 }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "school-management.fullname" . }}-academic-service
+  namespace: {{ .Values.namespace }}
+  labels:
+    app.kubernetes.io/component: academic-service
+    {{- include "school-management.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.academicService.replicaCount }}
+  selector:
+    matchLabels:
+      app.kubernetes.io/component: academic-service
+      {{- include "school-management.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/component: academic-service
+        {{- include "school-management.selectorLabels" . | nindent 8 }}
+    spec:
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+        - name: academic-service
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: {{ include "school-management.academicServiceImage" . }}
+          imagePullPolicy: {{ .Values.academicService.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: 8083
+              protocol: TCP
+          env:
+            - name: COUCHBASE_HOST
+              value: {{ .Values.couchbase.host | quote }}
+            - name: COUCHBASE_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "school-management.fullname" . }}-couchbase-secret
+                  key: username
+            - name: COUCHBASE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "school-management.fullname" . }}-couchbase-secret
+                  key: password
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: http
+            initialDelaySeconds: 30
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: http
+            initialDelaySeconds: 5
+            periodSeconds: 5
+          resources:
+            {{- toYaml .Values.academicService.resources | nindent 12 }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "school-management.fullname" . }}-achievement-service
+  namespace: {{ .Values.namespace }}
+  labels:
+    app.kubernetes.io/component: achievement-service
+    {{- include "school-management.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.achievementService.replicaCount }}
+  selector:
+    matchLabels:
+      app.kubernetes.io/component: achievement-service
+      {{- include "school-management.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/component: achievement-service
+        {{- include "school-management.selectorLabels" . | nindent 8 }}
+    spec:
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+        - name: achievement-service
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: {{ include "school-management.achievementServiceImage" . }}
+          imagePullPolicy: {{ .Values.achievementService.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: 8084
+              protocol: TCP
+          env:
+            - name: COUCHBASE_HOST
+              value: {{ .Values.couchbase.host | quote }}
+            - name: COUCHBASE_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "school-management.fullname" . }}-couchbase-secret
+                  key: username
+            - name: COUCHBASE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "school-management.fullname" . }}-couchbase-secret
+                  key: password
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: http
+            initialDelaySeconds: 30
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: http
+            initialDelaySeconds: 5
+            periodSeconds: 5
+          resources:
+            {{- toYaml .Values.achievementService.resources | nindent 12 }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}

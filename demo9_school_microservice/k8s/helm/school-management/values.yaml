@@ -1,0 +1,196 @@
+# Default values for school-management.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+global:
+  imageRegistry: "school-mgmt"
+  imageTag: "latest"
+  imagePullPolicy: IfNotPresent
+  environment: "production"
+
+# Target namespace for deployment
+namespace: "school-demo"
+
+# API Gateway configuration
+apiGateway:
+  replicaCount: 2
+  image:
+    repository: school-mgmt/api-gateway
+    tag: ""  # Uses global.imageTag if not specified
+    pullPolicy: IfNotPresent
+  service:
+    type: ClusterIP
+    port: 8080
+  resources:
+    limits:
+      cpu: 500m
+      memory: 512Mi
+    requests:
+      cpu: 250m
+      memory: 256Mi
+
+# Student Service configuration
+studentService:
+  replicaCount: 2
+  image:
+    repository: school-mgmt/student-service
+    tag: ""  # Uses global.imageTag if not specified
+    pullPolicy: IfNotPresent
+  service:
+    type: ClusterIP
+    port: 8081
+  resources:
+    limits:
+      cpu: 500m
+      memory: 512Mi
+    requests:
+      cpu: 250m
+      memory: 256Mi
+
+# Teacher Service configuration
+teacherService:
+  replicaCount: 2
+  image:
+    repository: school-mgmt/teacher-service
+    tag: ""  # Uses global.imageTag if not specified
+    pullPolicy: IfNotPresent
+  service:
+    type: ClusterIP
+    port: 8082
+  resources:
+    limits:
+      cpu: 500m
+      memory: 512Mi
+    requests:
+      cpu: 250m
+      memory: 256Mi
+
+# Academic Service configuration
+academicService:
+  replicaCount: 2
+  image:
+    repository: school-mgmt/academic-service
+    tag: ""  # Uses global.imageTag if not specified
+    pullPolicy: IfNotPresent
+  service:
+    type: ClusterIP
+    port: 8083
+  resources:
+    limits:
+      cpu: 500m
+      memory: 512Mi
+    requests:
+      cpu: 250m
+      memory: 256Mi
+
+# Achievement Service configuration
+achievementService:
+  replicaCount: 2
+  image:
+    repository: school-mgmt/achievement-service
+    tag: ""  # Uses global.imageTag if not specified
+    pullPolicy: IfNotPresent
+  service:
+    type: ClusterIP
+    port: 8084
+  resources:
+    limits:
+      cpu: 500m
+      memory: 512Mi
+    requests:
+      cpu: 250m
+      memory: 256Mi
+
+# Couchbase configuration
+couchbase:
+  # Set to true to deploy Couchbase in the cluster
+  # Set to false to use external Couchbase instance
+  deploy: true
+  
+  replicaCount: 1
+  
+  image:
+    repository: couchbase/server
+    tag: "7.2.0"
+    pullPolicy: IfNotPresent
+  
+  service:
+    type: ClusterIP
+    
+  # Couchbase credentials (should be overridden in production)
+  username: "Administrator"
+  password: "password123"
+  
+  # External Couchbase connection (used when deploy: false)
+  host: "couchbase-cluster.example.com"
+  
+  # Persistence configuration
+  persistence:
+    enabled: true
+    storageClass: "default"
+    size: "20Gi"
+  
+  resources:
+    limits:
+      cpu: 1000m
+      memory: 2Gi
+    requests:
+      cpu: 500m
+      memory: 1Gi
+
+# Ingress configuration
+ingress:
+  enabled: false
+  className: "nginx"
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+    nginx.ingress.kubernetes.io/ssl-redirect: "false"
+  hosts:
+    - host: school-mgmt.local
+      paths:
+        - path: /
+          pathType: Prefix
+  tls: []
+  # - secretName: school-mgmt-tls
+  #   hosts:
+  #     - school-mgmt.local
+
+# Security Context for pods
+podSecurityContext:
+  fsGroup: 2000
+  runAsNonRoot: true
+  runAsUser: 1000
+
+securityContext:
+  allowPrivilegeEscalation: false
+  capabilities:
+    drop:
+    - ALL
+  readOnlyRootFilesystem: true
+  runAsNonRoot: true
+  runAsUser: 1000
+
+# Node selector, affinity, and tolerations
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
+
+# Network Policy configuration
+networkPolicy:
+  enabled: false
+
+# Service Monitor for Prometheus (requires Prometheus Operator)
+serviceMonitor:
+  enabled: false
+  interval: 30s
+  scrapeTimeout: 10s
+
+# Autoscaling configuration
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 10
+  targetCPUUtilizationPercentage: 80
+  targetMemoryUtilizationPercentage: 80
