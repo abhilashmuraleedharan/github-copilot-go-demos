@@ -1,0 +1,94 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "school-management.fullname" . }}-api-gateway
+  namespace: {{ .Values.namespace }}
+  labels:
+    app.kubernetes.io/component: api-gateway
+    {{- include "school-management.labels" . | nindent 4 }}
+spec:
+  type: {{ .Values.apiGateway.service.type }}
+  ports:
+    - port: {{ .Values.apiGateway.service.port }}
+      targetPort: http
+      protocol: TCP
+      name: http
+  selector:
+    app.kubernetes.io/component: api-gateway
+    {{- include "school-management.selectorLabels" . | nindent 4 }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "school-management.fullname" . }}-student-service
+  namespace: {{ .Values.namespace }}
+  labels:
+    app.kubernetes.io/component: student-service
+    {{- include "school-management.labels" . | nindent 4 }}
+spec:
+  type: {{ .Values.studentService.service.type }}
+  ports:
+    - port: {{ .Values.studentService.service.port }}
+      targetPort: http
+      protocol: TCP
+      name: http
+  selector:
+    app.kubernetes.io/component: student-service
+    {{- include "school-management.selectorLabels" . | nindent 4 }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "school-management.fullname" . }}-teacher-service
+  namespace: {{ .Values.namespace }}
+  labels:
+    app.kubernetes.io/component: teacher-service
+    {{- include "school-management.labels" . | nindent 4 }}
+spec:
+  type: {{ .Values.teacherService.service.type }}
+  ports:
+    - port: {{ .Values.teacherService.service.port }}
+      targetPort: http
+      protocol: TCP
+      name: http
+  selector:
+    app.kubernetes.io/component: teacher-service
+    {{- include "school-management.selectorLabels" . | nindent 4 }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "school-management.fullname" . }}-academic-service
+  namespace: {{ .Values.namespace }}
+  labels:
+    app.kubernetes.io/component: academic-service
+    {{- include "school-management.labels" . | nindent 4 }}
+spec:
+  type: {{ .Values.academicService.service.type }}
+  ports:
+    - port: {{ .Values.academicService.service.port }}
+      targetPort: http
+      protocol: TCP
+      name: http
+  selector:
+    app.kubernetes.io/component: academic-service
+    {{- include "school-management.selectorLabels" . | nindent 4 }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "school-management.fullname" . }}-achievement-service
+  namespace: {{ .Values.namespace }}
+  labels:
+    app.kubernetes.io/component: achievement-service
+    {{- include "school-management.labels" . | nindent 4 }}
+spec:
+  type: {{ .Values.achievementService.service.type }}
+  ports:
+    - port: {{ .Values.achievementService.service.port }}
+      targetPort: http
+      protocol: TCP
+      name: http
+  selector:
+    app.kubernetes.io/component: achievement-service
+    {{- include "school-management.selectorLabels" . | nindent 4 }}

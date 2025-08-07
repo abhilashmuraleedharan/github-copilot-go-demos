@@ -1,0 +1,138 @@
+services:
+  # Couchbase Database
+  couchbase:
+    image: couchbase:enterprise-7.2.0
+    container_name: schoolmgmt-couchbase
+    ports:
+      - "8091-8096:8091-8096"
+      - "11210:11210"
+    environment:
+      - CLUSTER_NAME=schoolmgmt-cluster
+    volumes:
+      - couchbase_data:/opt/couchbase/var
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8091/pools"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  # API Gateway
+  api-gateway:
+    build:
+      context: ./gateway
+      dockerfile: Dockerfile
+    container_name: schoolmgmt-api-gateway
+    ports:
+      - "8080:8080"
+    environment:
+      - PORT=8080
+      - SERVICE_NAME=api-gateway
+    depends_on:
+      - student-service
+      - teacher-service
+      - academic-service
+      - achievement-service
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Student Service
+  student-service:
+    build:
+      context: .
+      dockerfile: ./services/student-service/Dockerfile
+    container_name: schoolmgmt-student-service
+    ports:
+      - "8081:8081"
+    environment:
+      - PORT=8081
+      - SERVICE_NAME=student-service
+      - COUCHBASE_HOST=couchbase
+      - COUCHBASE_USERNAME=Administrator
+      - COUCHBASE_PASSWORD=password123
+      - COUCHBASE_BUCKET=schoolmgmt
+    depends_on:
+      - couchbase
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8081/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Teacher Service
+  teacher-service:
+    build:
+      context: .
+      dockerfile: ./services/teacher-service/Dockerfile
+    container_name: schoolmgmt-teacher-service
+    ports:
+      - "8082:8082"
+    environment:
+      - PORT=8082
+      - SERVICE_NAME=teacher-service
+      - COUCHBASE_HOST=couchbase
+      - COUCHBASE_USERNAME=Administrator
+      - COUCHBASE_PASSWORD=password123
+      - COUCHBASE_BUCKET=schoolmgmt
+    depends_on:
+      - couchbase
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8082/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Academic Service
+  academic-service:
+    build:
+      context: .
+      dockerfile: ./services/academic-service/Dockerfile
+    container_name: schoolmgmt-academic-service
+    ports:
+      - "8083:8083"
+    environment:
+      - PORT=8083
+      - SERVICE_NAME=academic-service
+      - COUCHBASE_HOST=couchbase
+      - COUCHBASE_USERNAME=Administrator
+      - COUCHBASE_PASSWORD=password123
+      - COUCHBASE_BUCKET=schoolmgmt
+    depends_on:
+      - couchbase
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8083/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Achievement Service
+  achievement-service:
+    build:
+      context: .
+      dockerfile: ./services/achievement-service/Dockerfile
+    container_name: schoolmgmt-achievement-service
+    ports:
+      - "8084:8084"
+    environment:
+      - PORT=8084
+      - SERVICE_NAME=achievement-service
+      - COUCHBASE_HOST=couchbase
+      - COUCHBASE_USERNAME=Administrator
+      - COUCHBASE_PASSWORD=password123
+      - COUCHBASE_BUCKET=schoolmgmt
+    depends_on:
+      - couchbase
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8084/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+volumes:
+  couchbase_data:
+
+networks:
+  default:
+    name: schoolmgmt-network
