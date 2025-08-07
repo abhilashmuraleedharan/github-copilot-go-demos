@@ -2,6 +2,8 @@ package main
 
 import "fmt"
 
+// [AI GENERATED] LLM: GitHub Copilot, Mode: Documentation, Date: 2024-06-09
+// HasTripletSum returns true if there exists a triplet in nums whose sum equals target.
 func HasTripletSum(nums []int, target int) bool {
 	i := 0
 	for i < len(nums) {
@@ -16,6 +18,7 @@ func HasTripletSum(nums []int, target int) bool {
 			}
 			j++
 		}
+		i++
 	}
 	return false
 }
