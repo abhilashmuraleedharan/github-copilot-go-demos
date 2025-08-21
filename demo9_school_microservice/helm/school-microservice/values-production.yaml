@@ -1,0 +1,135 @@
+# [AI GENERATED] LLM: GitHub Copilot, Mode: Chat, Date: 2025-08-21
+# Production values for School Microservice
+# Override default values for production deployment
+
+# Image settings for production
+image:
+  registry: your-registry.com
+  repository: school-microservice
+  tag: "1.0.0"
+  pullPolicy: Always
+
+# Higher resource limits for production
+resources:
+  limits:
+    cpu: 1000m
+    memory: 1Gi
+  requests:
+    cpu: 500m
+    memory: 512Mi
+
+# Production autoscaling settings
+autoscaling:
+  enabled: true
+  minReplicas: 3
+  maxReplicas: 20
+  targetCPUUtilizationPercentage: 60
+  targetMemoryUtilizationPercentage: 70
+
+# Production service replicas
+services:
+  students:
+    replicaCount: 3
+  teachers:
+    replicaCount: 3
+  classes:
+    replicaCount: 3
+  academics:
+    replicaCount: 3
+  achievements:
+    replicaCount: 3
+
+# Production Couchbase cluster
+couchbase:
+  enabled: true
+  cluster:
+    size: 5
+    antiAffinity: true
+    resources:
+      limits:
+        cpu: 4
+        memory: 8Gi
+      requests:
+        cpu: 2
+        memory: 4Gi
+  buckets:
+    - name: school
+      type: couchbase
+      memoryQuota: 4096
+      replicas: 2
+      ioPriority: high
+
+# Production ingress with TLS
+ingress:
+  enabled: true
+  className: "nginx"
+  annotations:
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+  hosts:
+    - host: api.school.yourdomain.com
+      paths:
+        - path: /students
+          pathType: Prefix
+          service: students-service
+        - path: /teachers
+          pathType: Prefix
+          service: teachers-service
+        - path: /classes
+          pathType: Prefix
+          service: classes-service
+        - path: /academics
+          pathType: Prefix
+          service: academics-service
+        - path: /achievements
+          pathType: Prefix
+          service: achievements-service
+  tls:
+    - secretName: school-microservice-tls
+      hosts:
+        - api.school.yourdomain.com
+
+# Enable monitoring
+serviceMonitor:
+  enabled: true
+  namespace: monitoring
+  labels:
+    prometheus: kube-prometheus
+
+# Pod anti-affinity for high availability
+affinity:
+  podAntiAffinity:
+    preferredDuringSchedulingIgnoredDuringExecution:
+    - weight: 100
+      podAffinityTerm:
+        labelSelector:
+          matchExpressions:
+          - key: app.kubernetes.io/name
+            operator: In
+            values:
+            - school-microservice
+        topologyKey: kubernetes.io/hostname
+
+# Network policy for production security
+networkPolicy:
+  enabled: true
+  ingress:
+    - from:
+      - namespaceSelector:
+          matchLabels:
+            name: ingress-nginx
+      - namespaceSelector:
+          matchLabels:
+            name: monitoring
+      ports:
+      - protocol: TCP
+        port: 8081
+      - protocol: TCP
+        port: 8082
+      - protocol: TCP
+        port: 8083
+      - protocol: TCP
+        port: 8084
+      - protocol: TCP
+        port: 8085

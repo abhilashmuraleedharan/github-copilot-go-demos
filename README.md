@@ -20,6 +20,12 @@ This repository contains a set of guided demos to showcase how [GitHub Copilot a
 
 ---
 
+# CDR Transformation Microservice
+
+This project implements a modular microservice for CDR (Call Detail Record) ingestion, enrichment, transformation, filtering, and exporting.
+
+See [specs.md](./specs.md) for detailed requirements and design.
+
 ## License
 
 [MIT License](LICENSE)

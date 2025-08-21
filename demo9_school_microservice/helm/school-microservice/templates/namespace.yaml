@@ -1,0 +1,12 @@
+# [AI GENERATED] LLM: GitHub Copilot, Mode: Chat, Date: 2025-08-21
+{{- if .Values.namespace.create }}
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: {{ .Values.namespace.name }}
+  labels:
+    {{- include "school-microservice.labels" . | nindent 4 }}
+    name: {{ .Values.namespace.name }}
+  annotations:
+    helm.sh/resource-policy: keep
+{{- end }}

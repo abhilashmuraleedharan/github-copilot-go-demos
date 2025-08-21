@@ -1,0 +1,92 @@
+# [AI GENERATED] LLM: GitHub Copilot, Mode: Chat, Date: 2025-08-21
+# Development values for School Microservice
+# Minimal resources for development environment
+
+# Image settings for development
+image:
+  registry: ""
+  repository: school-microservice
+  tag: "latest"
+  pullPolicy: IfNotPresent
+
+# Lower resource requirements for development
+resources:
+  limits:
+    cpu: 200m
+    memory: 256Mi
+  requests:
+    cpu: 50m
+    memory: 64Mi
+
+# Disabled autoscaling for development
+autoscaling:
+  enabled: false
+
+# Single replica for development
+services:
+  students:
+    replicaCount: 1
+  teachers:
+    replicaCount: 1
+  classes:
+    replicaCount: 1
+  academics:
+    replicaCount: 1
+  achievements:
+    replicaCount: 1
+
+# Minimal Couchbase for development
+couchbase:
+  enabled: true
+  cluster:
+    size: 1
+    antiAffinity: false
+    resources:
+      limits:
+        cpu: 1
+        memory: 2Gi
+      requests:
+        cpu: 500m
+        memory: 1Gi
+  buckets:
+    - name: school
+      type: couchbase
+      memoryQuota: 512
+      replicas: 0
+
+# Development ingress without TLS
+ingress:
+  enabled: true
+  className: "nginx"
+  annotations:
+    nginx.ingress.kubernetes.io/ssl-redirect: "false"
+  hosts:
+    - host: school-api.local
+      paths:
+        - path: /students
+          pathType: Prefix
+          service: students-service
+        - path: /teachers
+          pathType: Prefix
+          service: teachers-service
+        - path: /classes
+          pathType: Prefix
+          service: classes-service
+        - path: /academics
+          pathType: Prefix
+          service: academics-service
+        - path: /achievements
+          pathType: Prefix
+          service: achievements-service
+
+# Disabled monitoring for development
+serviceMonitor:
+  enabled: false
+
+# Disabled network policies for development
+networkPolicy:
+  enabled: false
+
+# Disabled pod disruption budget for development
+podDisruptionBudget:
+  enabled: false

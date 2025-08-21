@@ -1,0 +1,24 @@
+# [AI GENERATED] LLM: GitHub Copilot, Mode: Chat, Date: 2025-08-21
+apiVersion: v2
+name: school-microservice
+description: A Helm chart for School Microservice - Domain-oriented microservices for managing school operations
+type: application
+version: 1.0.0
+appVersion: "1.0.0"
+home: https://github.com/abhilashmuraleedharan/github-copilot-go-demos
+sources:
+  - https://github.com/abhilashmuraleedharan/github-copilot-go-demos
+maintainers:
+  - name: School Microservice Team
+    email: team@school-microservice.com
+keywords:
+  - school
+  - microservice
+  - education
+  - couchbase
+  - go
+dependencies:
+  - name: couchbase-operator
+    version: "2.4.0"
+    repository: "https://couchbase-partners.github.io/helm-charts/"
+    condition: couchbase.enabled

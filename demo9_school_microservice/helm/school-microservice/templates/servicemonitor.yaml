@@ -1,0 +1,29 @@
+# [AI GENERATED] LLM: GitHub Copilot, Mode: Chat, Date: 2025-08-21
+{{- if .Values.serviceMonitor.enabled }}
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: {{ include "school-microservice.fullname" . }}
+  namespace: {{ .Values.serviceMonitor.namespace | default .Values.namespace.name }}
+  labels:
+    {{- include "school-microservice.labels" . | nindent 4 }}
+    {{- with .Values.serviceMonitor.labels }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+spec:
+  selector:
+    matchLabels:
+      {{- include "school-microservice.selectorLabels" . | nindent 6 }}
+  endpoints:
+    {{- range $serviceName, $service := .Values.services }}
+    {{- if $service.enabled }}
+    - port: http
+      path: {{ $.Values.serviceMonitor.path }}
+      interval: {{ $.Values.serviceMonitor.interval }}
+      targetPort: {{ $service.targetPort }}
+    {{- end }}
+    {{- end }}
+  namespaceSelector:
+    matchNames:
+      - {{ .Values.namespace.name }}
+{{- end }}

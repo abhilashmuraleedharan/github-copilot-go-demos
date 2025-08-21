@@ -1,0 +1,268 @@
+# [AI GENERATED] LLM: GitHub Copilot, Mode: Chat, Date: 2025-08-21
+# Default values for school-microservice Helm chart
+# This is a YAML-formatted file.
+
+# Global settings
+global:
+  imageRegistry: ""
+  imagePullSecrets: []
+  storageClass: ""
+
+# Namespace configuration
+namespace:
+  name: school-demo
+  create: true
+
+# Image settings
+image:
+  registry: docker.io
+  repository: school-microservice
+  tag: "1.0.0"
+  pullPolicy: IfNotPresent
+
+# Service Account
+serviceAccount:
+  create: true
+  annotations: {}
+  name: "school-microservice"
+
+# Pod Security Context
+podSecurityContext:
+  runAsNonRoot: true
+  runAsUser: 1001
+  runAsGroup: 1001
+  fsGroup: 1001
+
+# Security Context
+securityContext:
+  allowPrivilegeEscalation: false
+  readOnlyRootFilesystem: true
+  capabilities:
+    drop:
+    - ALL
+
+# Resource limits and requests
+resources:
+  limits:
+    cpu: 500m
+    memory: 512Mi
+  requests:
+    cpu: 100m
+    memory: 128Mi
+
+# Horizontal Pod Autoscaler
+autoscaling:
+  enabled: true
+  minReplicas: 2
+  maxReplicas: 10
+  targetCPUUtilizationPercentage: 70
+  targetMemoryUtilizationPercentage: 80
+
+# Node selector and tolerations
+nodeSelector: {}
+tolerations: []
+affinity: {}
+
+# Pod Disruption Budget
+podDisruptionBudget:
+  enabled: true
+  minAvailable: 1
+
+# Ingress configuration
+ingress:
+  enabled: true
+  className: "nginx"
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+    nginx.ingress.kubernetes.io/ssl-redirect: "false"
+    nginx.ingress.kubernetes.io/backend-protocol: "HTTP"
+  hosts:
+    - host: school-api.local
+      paths:
+        - path: /students
+          pathType: Prefix
+          service: students-service
+        - path: /teachers
+          pathType: Prefix
+          service: teachers-service
+        - path: /classes
+          pathType: Prefix
+          service: classes-service
+        - path: /academics
+          pathType: Prefix
+          service: academics-service
+        - path: /achievements
+          pathType: Prefix
+          service: achievements-service
+  tls: []
+
+# Service Monitor for Prometheus
+serviceMonitor:
+  enabled: false
+  namespace: monitoring
+  labels: {}
+  interval: 30s
+  path: /metrics
+
+# Individual service configurations
+services:
+  students:
+    enabled: true
+    replicaCount: 2
+    port: 8081
+    targetPort: 8081
+    image:
+      repository: students-service
+    env:
+      STUDENTS_PORT: "8081"
+    
+  teachers:
+    enabled: true
+    replicaCount: 2
+    port: 8082
+    targetPort: 8082
+    image:
+      repository: teachers-service
+    env:
+      TEACHERS_PORT: "8082"
+    
+  classes:
+    enabled: true
+    replicaCount: 2
+    port: 8083
+    targetPort: 8083
+    image:
+      repository: classes-service
+    env:
+      CLASSES_PORT: "8083"
+    
+  academics:
+    enabled: true
+    replicaCount: 2
+    port: 8084
+    targetPort: 8084
+    image:
+      repository: academics-service
+    env:
+      ACADEMICS_PORT: "8084"
+    
+  achievements:
+    enabled: true
+    replicaCount: 2
+    port: 8085
+    targetPort: 8085
+    image:
+      repository: achievements-service
+    env:
+      ACHIEVEMENTS_PORT: "8085"
+
+# Couchbase configuration
+couchbase:
+  enabled: true
+  cluster:
+    name: school-couchbase-cluster
+    image: couchbase:community-7.2.0
+    size: 3
+    version: 7.2.0
+    antiAffinity: true
+    resources:
+      limits:
+        cpu: 2
+        memory: 4Gi
+      requests:
+        cpu: 1
+        memory: 2Gi
+  buckets:
+    - name: school
+      type: couchbase
+      memoryQuota: 1024
+      replicas: 1
+      ioPriority: high
+      evictionPolicy: fullEviction
+      conflictResolution: seqno
+      enableFlush: false
+      enableIndexReplica: true
+  
+  # Couchbase credentials (should be in secrets)
+  auth:
+    username: Administrator
+    password: password
+    
+  # Service configuration
+  service:
+    type: ClusterIP
+    ports:
+      - name: couchbase
+        port: 8091
+        targetPort: 8091
+      - name: couchbase-ssl
+        port: 18091
+        targetPort: 18091
+
+# ConfigMap for application configuration
+configMap:
+  create: true
+  data:
+    COUCHBASE_HOST: "school-couchbase-cluster"
+    COUCHBASE_BUCKET: "school"
+
+# Secret for sensitive data
+secret:
+  create: true
+  data:
+    COUCHBASE_USERNAME: "Administrator"
+    COUCHBASE_PASSWORD: "password"
+
+# Health check configuration
+healthCheck:
+  enabled: true
+  livenessProbe:
+    httpGet:
+      path: /health
+      port: http
+    initialDelaySeconds: 30
+    periodSeconds: 10
+    timeoutSeconds: 5
+    failureThreshold: 3
+  readinessProbe:
+    httpGet:
+      path: /health
+      port: http
+    initialDelaySeconds: 5
+    periodSeconds: 5
+    timeoutSeconds: 3
+    failureThreshold: 3
+
+# Network Policies
+networkPolicy:
+  enabled: true
+  ingress:
+    - from:
+      - namespaceSelector:
+          matchLabels:
+            name: ingress-nginx
+      ports:
+      - protocol: TCP
+        port: 8081
+      - protocol: TCP
+        port: 8082
+      - protocol: TCP
+        port: 8083
+      - protocol: TCP
+        port: 8084
+      - protocol: TCP
+        port: 8085
+  egress:
+    - to:
+      - namespaceSelector:
+          matchLabels:
+            name: school-demo
+      ports:
+      - protocol: TCP
+        port: 8091
+    - to: []
+      ports:
+      - protocol: TCP
+        port: 53
+      - protocol: UDP
+        port: 53

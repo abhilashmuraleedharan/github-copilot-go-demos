@@ -1,0 +1,123 @@
+version: '3.8'
+
+services:
+  # Couchbase Database
+  couchbase:
+    image: couchbase:community-7.2.0
+    container_name: couchbase
+    ports:
+      - "8091-8096:8091-8096"
+      - "11210:11210"
+    environment:
+      - COUCHBASE_ADMINISTRATOR_USERNAME=${COUCHBASE_USERNAME:-Administrator}
+      - COUCHBASE_ADMINISTRATOR_PASSWORD=${COUCHBASE_PASSWORD:-password}
+    volumes:
+      - couchbase_data:/opt/couchbase/var
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8091/pools"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+
+  # Students Service
+  students-service:
+    build:
+      context: .
+      dockerfile: services/students/Dockerfile
+    container_name: students-service
+    ports:
+      - "${STUDENTS_PORT:-8081}:${STUDENTS_PORT:-8081}"
+    environment:
+      - COUCHBASE_HOST=couchbase
+      - COUCHBASE_USERNAME=${COUCHBASE_USERNAME:-Administrator}
+      - COUCHBASE_PASSWORD=${COUCHBASE_PASSWORD:-password}
+      - COUCHBASE_BUCKET=${COUCHBASE_BUCKET:-school}
+      - STUDENTS_PORT=${STUDENTS_PORT:-8081}
+    depends_on:
+      couchbase:
+        condition: service_healthy
+    restart: unless-stopped
+
+  # Teachers Service
+  teachers-service:
+    build:
+      context: .
+      dockerfile: services/teachers/Dockerfile
+    container_name: teachers-service
+    ports:
+      - "${TEACHERS_PORT:-8082}:${TEACHERS_PORT:-8082}"
+    environment:
+      - COUCHBASE_HOST=couchbase
+      - COUCHBASE_USERNAME=${COUCHBASE_USERNAME:-Administrator}
+      - COUCHBASE_PASSWORD=${COUCHBASE_PASSWORD:-password}
+      - COUCHBASE_BUCKET=${COUCHBASE_BUCKET:-school}
+      - TEACHERS_PORT=${TEACHERS_PORT:-8082}
+    depends_on:
+      couchbase:
+        condition: service_healthy
+    restart: unless-stopped
+
+  # Classes Service
+  classes-service:
+    build:
+      context: .
+      dockerfile: services/classes/Dockerfile
+    container_name: classes-service
+    ports:
+      - "${CLASSES_PORT:-8083}:${CLASSES_PORT:-8083}"
+    environment:
+      - COUCHBASE_HOST=couchbase
+      - COUCHBASE_USERNAME=${COUCHBASE_USERNAME:-Administrator}
+      - COUCHBASE_PASSWORD=${COUCHBASE_PASSWORD:-password}
+      - COUCHBASE_BUCKET=${COUCHBASE_BUCKET:-school}
+      - CLASSES_PORT=${CLASSES_PORT:-8083}
+    depends_on:
+      couchbase:
+        condition: service_healthy
+    restart: unless-stopped
+
+  # Academics Service
+  academics-service:
+    build:
+      context: .
+      dockerfile: services/academics/Dockerfile
+    container_name: academics-service
+    ports:
+      - "${ACADEMICS_PORT:-8084}:${ACADEMICS_PORT:-8084}"
+    environment:
+      - COUCHBASE_HOST=couchbase
+      - COUCHBASE_USERNAME=${COUCHBASE_USERNAME:-Administrator}
+      - COUCHBASE_PASSWORD=${COUCHBASE_PASSWORD:-password}
+      - COUCHBASE_BUCKET=${COUCHBASE_BUCKET:-school}
+      - ACADEMICS_PORT=${ACADEMICS_PORT:-8084}
+    depends_on:
+      couchbase:
+        condition: service_healthy
+    restart: unless-stopped
+
+  # Achievements Service
+  achievements-service:
+    build:
+      context: .
+      dockerfile: services/achievements/Dockerfile
+    container_name: achievements-service
+    ports:
+      - "${ACHIEVEMENTS_PORT:-8085}:${ACHIEVEMENTS_PORT:-8085}"
+    environment:
+      - COUCHBASE_HOST=couchbase
+      - COUCHBASE_USERNAME=${COUCHBASE_USERNAME:-Administrator}
+      - COUCHBASE_PASSWORD=${COUCHBASE_PASSWORD:-password}
+      - COUCHBASE_BUCKET=${COUCHBASE_BUCKET:-school}
+      - ACHIEVEMENTS_PORT=${ACHIEVEMENTS_PORT:-8085}
+    depends_on:
+      couchbase:
+        condition: service_healthy
+    restart: unless-stopped
+
+volumes:
+  couchbase_data:
+
+networks:
+  default:
+    name: school-network
