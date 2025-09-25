@@ -1,0 +1,42 @@
+# [AI GENERATED] LLM: GitHub Copilot, Mode: Chat, Date: 2025-09-24
+{{- if and .Values.monitoring.enabled .Values.monitoring.serviceMonitor.enabled }}
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: {{ include "school-microservice.fullname" . }}
+  namespace: {{ .Values.namespace.name }}
+  labels:
+    {{- include "school-microservice.labels" . | nindent 4 }}
+spec:
+  selector:
+    matchLabels:
+      {{- include "school-microservice.selectorLabels" . | nindent 6 }}
+  endpoints:
+  - port: http
+    path: {{ .Values.monitoring.serviceMonitor.path }}
+    interval: {{ .Values.monitoring.serviceMonitor.interval }}
+    scrapeTimeout: 10s
+{{- end }}
+---
+{{- if and .Values.monitoring.enabled .Values.monitoring.prometheusRule.enabled }}
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: {{ include "school-microservice.fullname" . }}
+  namespace: {{ .Values.namespace.name }}
+  labels:
+    {{- include "school-microservice.labels" . | nindent 4 }}
+spec:
+  groups:
+  - name: school-microservice.rules
+    rules:
+    {{- range .Values.monitoring.prometheusRule.rules }}
+    - alert: {{ .alert }}
+      expr: {{ .expr }}
+      for: {{ .for }}
+      labels:
+        {{- toYaml .labels | nindent 8 }}
+      annotations:
+        {{- toYaml .annotations | nindent 8 }}
+    {{- end }}
+{{- end }}

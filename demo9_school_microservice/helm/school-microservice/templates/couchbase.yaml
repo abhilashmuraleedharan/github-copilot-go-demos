@@ -1,0 +1,171 @@
+# [AI GENERATED] LLM: GitHub Copilot, Mode: Chat, Date: 2025-09-24
+{{- if .Values.couchbase.enabled }}
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ include "school-microservice.fullname" . }}-couchbase
+  namespace: {{ .Values.namespace.name }}
+  labels:
+    {{- include "school-microservice.labels" . | nindent 4 }}
+    component: couchbase
+spec:
+  serviceName: {{ include "school-microservice.fullname" . }}-couchbase-headless
+  replicas: 1
+  selector:
+    matchLabels:
+      {{- include "school-microservice.selectorLabels" . | nindent 6 }}
+      component: couchbase
+  template:
+    metadata:
+      labels:
+        {{- include "school-microservice.labels" . | nindent 8 }}
+        component: couchbase
+    spec:
+      securityContext:
+        fsGroup: 1000
+        runAsUser: 1000
+        runAsGroup: 1000
+      containers:
+        - name: couchbase
+          image: "{{ .Values.couchbase.image.repository }}:{{ .Values.couchbase.image.tag }}"
+          imagePullPolicy: {{ .Values.couchbase.image.pullPolicy }}
+          ports:
+            - containerPort: 8091
+              name: admin
+            - containerPort: 8092
+              name: api
+            - containerPort: 8093
+              name: query
+            - containerPort: 8094
+              name: fts
+            - containerPort: 8095
+              name: cbas
+            - containerPort: 8096
+              name: eventing
+            - containerPort: 8097
+              name: backup
+            - containerPort: 11207
+              name: smart-client
+            - containerPort: 11210
+              name: client
+            - containerPort: 11211
+              name: moxi
+          env:
+            - name: COUCHBASE_ADMINISTRATOR_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "school-microservice.fullname" . }}-couchbase-secret
+                  key: username
+            - name: COUCHBASE_ADMINISTRATOR_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "school-microservice.fullname" . }}-couchbase-secret
+                  key: password
+          livenessProbe:
+            httpGet:
+              path: /ui/index.html
+              port: 8091
+            initialDelaySeconds: 120
+            periodSeconds: 30
+            timeoutSeconds: 10
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /ui/index.html
+              port: 8091
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3
+          resources:
+            {{- toYaml .Values.couchbase.resources | nindent 12 }}
+          {{- if .Values.couchbase.persistence.enabled }}
+          volumeMounts:
+            - name: couchbase-data
+              mountPath: /opt/couchbase/var
+          {{- end }}
+      {{- if .Values.couchbase.persistence.enabled }}
+  volumeClaimTemplates:
+    - metadata:
+        name: couchbase-data
+      spec:
+        accessModes: [ "ReadWriteOnce" ]
+        {{- if .Values.couchbase.persistence.storageClass }}
+        storageClassName: {{ .Values.couchbase.persistence.storageClass }}
+        {{- end }}
+        resources:
+          requests:
+            storage: {{ .Values.couchbase.persistence.size }}
+      {{- end }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "school-microservice.fullname" . }}-couchbase-headless
+  namespace: {{ .Values.namespace.name }}
+  labels:
+    {{- include "school-microservice.labels" . | nindent 4 }}
+    component: couchbase
+spec:
+  clusterIP: None
+  selector:
+    {{- include "school-microservice.selectorLabels" . | nindent 4 }}
+    component: couchbase
+  ports:
+    - port: 8091
+      name: admin
+    - port: 8092
+      name: api
+    - port: 8093
+      name: query
+    - port: 8094
+      name: fts
+    - port: 8095
+      name: cbas
+    - port: 8096
+      name: eventing
+    - port: 8097
+      name: backup
+    - port: 11207
+      name: smart-client
+    - port: 11210
+      name: client
+    - port: 11211
+      name: moxi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: couchbase-service
+  namespace: {{ .Values.namespace.name }}
+  labels:
+    {{- include "school-microservice.labels" . | nindent 4 }}
+    component: couchbase
+spec:
+  type: {{ .Values.couchbase.service.type }}
+  selector:
+    {{- include "school-microservice.selectorLabels" . | nindent 4 }}
+    component: couchbase
+  ports:
+    - port: {{ .Values.couchbase.service.ports.admin }}
+      targetPort: 8091
+      name: admin
+    - port: {{ .Values.couchbase.service.ports.api }}
+      targetPort: 8092
+      name: api
+    - port: {{ .Values.couchbase.service.ports.query }}
+      targetPort: 8093
+      name: query
+    - port: {{ .Values.couchbase.service.ports.fts }}
+      targetPort: 8094
+      name: fts
+    - port: {{ .Values.couchbase.service.ports.cbas }}
+      targetPort: 8095
+      name: cbas
+    - port: {{ .Values.couchbase.service.ports.eventing }}
+      targetPort: 8096
+      name: eventing
+    - port: {{ .Values.couchbase.service.ports.backup }}
+      targetPort: 8097
+      name: backup
+{{- end }}

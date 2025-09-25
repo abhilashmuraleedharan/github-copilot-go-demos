@@ -1,0 +1,85 @@
+# [AI GENERATED] LLM: GitHub Copilot, Mode: Chat, Date: 2025-09-24
+# Docker Compose file for School Management Microservice
+version: '3.8'
+
+services:
+  # Couchbase Database
+  couchbase:
+    image: couchbase:community-7.2.0
+    container_name: school-couchbase
+    ports:
+      - "8091-8097:8091-8097"
+      - "9123:9123"
+      - "11207:11207"
+      - "11210:11210"
+      - "11280:11280"
+      - "18091-18097:18091-18097"
+    environment:
+      - COUCHBASE_ADMINISTRATOR_USERNAME=Administrator
+      - COUCHBASE_ADMINISTRATOR_PASSWORD=password
+    volumes:
+      - couchbase_data:/opt/couchbase/var
+      - ./scripts/couchbase-init.sh:/opt/couchbase/init/init.sh
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8091/ui/index.html"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 120s
+    networks:
+      - school-network
+
+  # School Microservice
+  school-service:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: school-service
+    ports:
+      - "8080:8080"
+    environment:
+      - SERVER_HOST=0.0.0.0
+      - SERVER_PORT=8080
+      - COUCHBASE_HOST=couchbase
+      - COUCHBASE_PORT=8091
+      - COUCHBASE_USERNAME=Administrator
+      - COUCHBASE_PASSWORD=password
+      - COUCHBASE_BUCKET_NAME=school
+      - GIN_MODE=release
+    depends_on:
+      couchbase:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    restart: unless-stopped
+    networks:
+      - school-network
+
+  # Optional: Nginx reverse proxy for load balancing
+  nginx:
+    image: nginx:alpine
+    container_name: school-nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - school-service
+    restart: unless-stopped
+    networks:
+      - school-network
+
+networks:
+  school-network:
+    driver: bridge
+    name: school-network
+
+volumes:
+  couchbase_data:
+    driver: local
+    name: school_couchbase_data

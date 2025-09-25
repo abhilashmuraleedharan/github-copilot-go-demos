@@ -1,0 +1,261 @@
+# [AI GENERATED] LLM: GitHub Copilot, Mode: Chat, Date: 2025-09-24
+# Default values for school-microservice
+# This is a YAML-formatted file.
+
+# Namespace configuration
+namespace:
+  name: school-demo
+  create: true
+  labels:
+    environment: production
+    team: education
+
+# Replica count
+replicaCount: 3
+
+# Image configuration
+image:
+  repository: school-microservice
+  pullPolicy: IfNotPresent
+  tag: "1.0.0"
+
+# Image pull secrets
+imagePullSecrets: []
+
+# Service account
+serviceAccount:
+  create: true
+  annotations: {}
+  name: ""
+
+# Pod annotations and labels
+podAnnotations: {}
+podLabels: {}
+
+# Pod security context
+podSecurityContext:
+  fsGroup: 65532
+  runAsNonRoot: true
+  runAsUser: 65532
+  runAsGroup: 65532
+
+# Container security context
+securityContext:
+  allowPrivilegeEscalation: false
+  capabilities:
+    drop:
+    - ALL
+  readOnlyRootFilesystem: true
+  runAsNonRoot: true
+  runAsUser: 65532
+  runAsGroup: 65532
+
+# Service configuration
+service:
+  type: ClusterIP
+  port: 80
+  targetPort: 8080
+  annotations: {}
+
+# Ingress configuration
+ingress:
+  enabled: true
+  className: "nginx"
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+  hosts:
+    - host: school-api.example.com
+      paths:
+        - path: /
+          pathType: Prefix
+  tls:
+    - secretName: school-microservice-tls
+      hosts:
+        - school-api.example.com
+
+# Resource limits and requests
+resources:
+  limits:
+    cpu: 500m
+    memory: 512Mi
+  requests:
+    cpu: 250m
+    memory: 256Mi
+
+# Autoscaling configuration
+autoscaling:
+  enabled: true
+  minReplicas: 3
+  maxReplicas: 10
+  targetCPUUtilizationPercentage: 70
+  targetMemoryUtilizationPercentage: 80
+
+# Liveness and readiness probes
+livenessProbe:
+  httpGet:
+    path: /health
+    port: http
+  initialDelaySeconds: 30
+  periodSeconds: 30
+  timeoutSeconds: 5
+  failureThreshold: 3
+  successThreshold: 1
+
+readinessProbe:
+  httpGet:
+    path: /health
+    port: http
+  initialDelaySeconds: 15
+  periodSeconds: 10
+  timeoutSeconds: 3
+  failureThreshold: 3
+  successThreshold: 1
+
+# Node selector
+nodeSelector: {}
+
+# Tolerations
+tolerations: []
+
+# Affinity and anti-affinity
+affinity:
+  podAntiAffinity:
+    preferredDuringSchedulingIgnoredDuringExecution:
+    - weight: 100
+      podAffinityTerm:
+        labelSelector:
+          matchExpressions:
+          - key: app.kubernetes.io/name
+            operator: In
+            values:
+            - school-microservice
+        topologyKey: kubernetes.io/hostname
+
+# Pod disruption budget
+podDisruptionBudget:
+  enabled: true
+  minAvailable: 2
+
+# Network policy
+networkPolicy:
+  enabled: true
+  policyTypes:
+    - Ingress
+    - Egress
+  ingress:
+    - from:
+      - namespaceSelector:
+          matchLabels:
+            name: ingress-nginx
+      - namespaceSelector:
+          matchLabels:
+            name: school-demo
+      ports:
+      - protocol: TCP
+        port: 8080
+  egress:
+    - to:
+      - namespaceSelector:
+          matchLabels:
+            name: school-demo
+      ports:
+      - protocol: TCP
+        port: 8091
+      - protocol: TCP
+        port: 8092
+      - protocol: TCP
+        port: 8093
+    - to: []
+      ports:
+      - protocol: TCP
+        port: 53
+      - protocol: UDP
+        port: 53
+
+# Application configuration
+config:
+  server:
+    host: "0.0.0.0"
+    port: "8080"
+    readTimeout: "15s"
+    writeTimeout: "15s"
+    idleTimeout: "60s"
+  
+  couchbase:
+    host: "couchbase-service"
+    port: "8091"
+    bucketName: "school"
+    scopeName: "_default"
+    collectionName: "_default"
+    connectTimeout: "10s"
+    kvTimeout: "2500ms"
+
+# Secret configuration for sensitive data
+secrets:
+  couchbase:
+    username: "Administrator"
+    password: "changeme-secure-password"
+
+# Couchbase deployment (can be disabled if using external database)
+couchbase:
+  enabled: true
+  image:
+    repository: couchbase
+    tag: "community-7.2.0"
+    pullPolicy: IfNotPresent
+  
+  persistence:
+    enabled: true
+    size: 10Gi
+    storageClass: ""
+  
+  resources:
+    limits:
+      cpu: 2
+      memory: 4Gi
+    requests:
+      cpu: 1
+      memory: 2Gi
+  
+  service:
+    type: ClusterIP
+    ports:
+      admin: 8091
+      api: 8092
+      query: 8093
+      fts: 8094
+      cbas: 8095
+      eventing: 8096
+      backup: 8097
+
+# Monitoring and observability
+monitoring:
+  enabled: true
+  serviceMonitor:
+    enabled: true
+    interval: 30s
+    path: /metrics
+  
+  prometheusRule:
+    enabled: true
+    rules:
+      - alert: SchoolServiceDown
+        expr: up{job="school-microservice"} == 0
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: "School microservice is down"
+          description: "School microservice has been down for more than 5 minutes"
+      
+      - alert: SchoolServiceHighErrorRate
+        expr: rate(http_requests_total{job="school-microservice",status=~"5.."}[5m]) > 0.1
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High error rate in school microservice"
+          description: "Error rate is above 10% for 5 minutes"

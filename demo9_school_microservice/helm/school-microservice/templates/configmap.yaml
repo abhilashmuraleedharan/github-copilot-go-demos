@@ -1,0 +1,22 @@
+# [AI GENERATED] LLM: GitHub Copilot, Mode: Chat, Date: 2025-09-24
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "school-microservice.fullname" . }}-config
+  namespace: {{ .Values.namespace.name }}
+  labels:
+    {{- include "school-microservice.labels" . | nindent 4 }}
+data:
+  SERVER_HOST: {{ .Values.config.server.host | quote }}
+  SERVER_PORT: {{ .Values.config.server.port | quote }}
+  SERVER_READ_TIMEOUT: {{ .Values.config.server.readTimeout | quote }}
+  SERVER_WRITE_TIMEOUT: {{ .Values.config.server.writeTimeout | quote }}
+  SERVER_IDLE_TIMEOUT: {{ .Values.config.server.idleTimeout | quote }}
+  COUCHBASE_HOST: {{ .Values.config.couchbase.host | quote }}
+  COUCHBASE_PORT: {{ .Values.config.couchbase.port | quote }}
+  COUCHBASE_BUCKET_NAME: {{ .Values.config.couchbase.bucketName | quote }}
+  COUCHBASE_SCOPE_NAME: {{ .Values.config.couchbase.scopeName | quote }}
+  COUCHBASE_COLLECTION_NAME: {{ .Values.config.couchbase.collectionName | quote }}
+  COUCHBASE_CONNECT_TIMEOUT: {{ .Values.config.couchbase.connectTimeout | quote }}
+  COUCHBASE_KV_TIMEOUT: {{ .Values.config.couchbase.kvTimeout | quote }}
+  GIN_MODE: "release"

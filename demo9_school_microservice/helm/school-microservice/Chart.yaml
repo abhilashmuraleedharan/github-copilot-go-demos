@@ -1,0 +1,22 @@
+# [AI GENERATED] LLM: GitHub Copilot, Mode: Chat, Date: 2025-09-24
+apiVersion: v2
+name: school-microservice
+description: A comprehensive school management microservice built with Go and Couchbase
+type: application
+version: 1.0.0
+appVersion: "1.0.0"
+keywords:
+  - school
+  - microservice
+  - education
+  - golang
+  - couchbase
+home: https://github.com/abhilashmuraleedharan/github-copilot-go-demos
+sources:
+  - https://github.com/abhilashmuraleedharan/github-copilot-go-demos/tree/main/demo9_school_microservice
+maintainers:
+  - name: School Management Team
+    email: team@school.edu
+annotations:
+  category: Education
+  licenses: MIT
