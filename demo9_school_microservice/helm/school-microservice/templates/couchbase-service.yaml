@@ -1,0 +1,46 @@
+{{- /*
+[AI GENERATED] LLM: GitHub Copilot, Mode: Chat, Date: 2025-12-15
+*/ -}}
+{{- if .Values.couchbase.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: couchbase-service
+  namespace: {{ .Values.namespace }}
+  labels:
+    {{- include "school-microservice.labels" . | nindent 4 }}
+    app.kubernetes.io/component: couchbase
+spec:
+  type: {{ .Values.couchbase.service.type }}
+  selector:
+    app: {{ .Values.couchbase.name }}
+  ports:
+  - name: console
+    port: {{ .Values.couchbase.service.ports.console }}
+    targetPort: 8091
+    protocol: TCP
+  - name: api
+    port: {{ .Values.couchbase.service.ports.api }}
+    targetPort: 8092
+    protocol: TCP
+  - name: query
+    port: {{ .Values.couchbase.service.ports.query }}
+    targetPort: 8093
+    protocol: TCP
+  - name: search
+    port: {{ .Values.couchbase.service.ports.search }}
+    targetPort: 8094
+    protocol: TCP
+  - name: analytics
+    port: {{ .Values.couchbase.service.ports.analytics }}
+    targetPort: 8095
+    protocol: TCP
+  - name: eventing
+    port: {{ .Values.couchbase.service.ports.eventing }}
+    targetPort: 8096
+    protocol: TCP
+  - name: client
+    port: {{ .Values.couchbase.service.ports.client }}
+    targetPort: 11210
+    protocol: TCP
+{{- end }}

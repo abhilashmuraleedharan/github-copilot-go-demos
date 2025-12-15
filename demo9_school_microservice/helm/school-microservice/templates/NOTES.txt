@@ -1,0 +1,82 @@
+[AI GENERATED] LLM: GitHub Copilot, Mode: Chat, Date: 2025-12-15
+
+Thank you for installing {{ .Chart.Name }}!
+
+Your release is named {{ .Release.Name }}.
+
+To learn more about the release, try:
+
+  $ helm status {{ .Release.Name }} -n {{ .Values.namespace }}
+  $ helm get all {{ .Release.Name }} -n {{ .Values.namespace }}
+
+The School Management Microservice has been deployed to the '{{ .Values.namespace }}' namespace.
+
+Application Details:
+==================
+- Service Name: {{ .Values.schoolService.name }}
+- Replicas: {{ .Values.schoolService.replicaCount }}
+- Image: {{ .Values.schoolService.image.repository }}:{{ .Values.schoolService.image.tag }}
+- Couchbase: {{ if .Values.couchbase.enabled }}Enabled{{ else }}Disabled{{ end }}
+
+Access the application:
+======================
+
+1. Get the application URL:
+
+{{- if .Values.ingress.enabled }}
+{{- range $host := .Values.ingress.hosts }}
+  http{{ if $.Values.ingress.tls }}s{{ end }}://{{ $host.host }}{{ (index $host.paths 0).path }}
+{{- end }}
+{{- else if eq .Values.schoolService.service.type "NodePort" }}
+  export NODE_PORT=$(kubectl get --namespace {{ .Values.namespace }} -o jsonpath="{.spec.ports[0].nodePort}" services {{ .Values.schoolService.name }})
+  export NODE_IP=$(kubectl get nodes --namespace {{ .Values.namespace }} -o jsonpath="{.items[0].status.addresses[0].address}")
+  echo "Access the API at: http://$NODE_IP:$NODE_PORT"
+{{- else if eq .Values.schoolService.service.type "LoadBalancer" }}
+  NOTE: It may take a few minutes for the LoadBalancer IP to be available.
+  
+  export SERVICE_IP=$(kubectl get svc --namespace {{ .Values.namespace }} {{ .Values.schoolService.name }} --template "{{"{{ range (index .status.loadBalancer.ingress 0) }}{{.}}{{ end }}"}}")
+  echo "Access the API at: http://$SERVICE_IP:{{ .Values.schoolService.service.port }}"
+{{- else if eq .Values.schoolService.service.type "ClusterIP" }}
+  kubectl port-forward --namespace {{ .Values.namespace }} svc/{{ .Values.schoolService.name }} 8080:{{ .Values.schoolService.service.port }}
+  echo "Access the API at: http://localhost:8080"
+{{- end }}
+
+2. Check the health endpoint:
+   curl http://localhost:8080/health
+
+3. Test the API:
+   # Create a student
+   curl -X POST http://localhost:8080/api/students \
+     -H "Content-Type: application/json" \
+     -d '{"id":"student001","firstName":"John","lastName":"Doe","grade":10}'
+
+   # Get all students
+   curl http://localhost:8080/api/students
+
+Monitoring:
+==========
+- Watch pods: kubectl get pods -n {{ .Values.namespace }} -w
+- View logs: kubectl logs -n {{ .Values.namespace }} -l app={{ .Values.schoolService.name }} -f
+- Check events: kubectl get events -n {{ .Values.namespace }} --sort-by='.lastTimestamp'
+
+{{- if .Values.couchbase.enabled }}
+
+Couchbase Access:
+================
+To access the Couchbase Web Console:
+  kubectl port-forward --namespace {{ .Values.namespace }} svc/couchbase-service 8091:8091
+  
+Then open: http://localhost:8091
+Username: {{ .Values.couchbase.auth.username }}
+Password: {{ .Values.couchbase.auth.password }}
+{{- end }}
+
+Troubleshooting:
+===============
+If pods are not starting:
+  kubectl describe pod -n {{ .Values.namespace }} -l app={{ .Values.schoolService.name }}
+
+If Couchbase initialization is pending:
+  kubectl logs -n {{ .Values.namespace }} job/couchbase-init
+
+For more information, visit: https://github.com/your-repo/school-microservice

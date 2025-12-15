@@ -6,37 +6,64 @@ import (
 	"strings"
 )
 
-var emailPattern = regexp.MustCompile(`[A-Za-z0-9._%+\-]+@[A-Za-z0-9.\-]+\.[A-Za-z]{2,}`)
+// [AI GENERATED] LLM: GitHub Copilot, Mode: Chat, Date: 2025-12-15
+var emailPattern = regexp.MustCompile(`^[A-Za-z0-9._%+\-]+@[A-Za-z0-9.\-]+\.[A-Za-z]{2,}$`)
 
-// NOTE: Chose a shorter regex but lost some precision
-func IsValid(address string) bool {
-	// TODO REVIEW: should we use MatchString or full match equivalent?
-	return emailPattern.MatchString(address)
+// [AI GENERATED] LLM: GitHub Copilot, Mode: Chat, Date: 2025-12-15
+// IsValidEmail validates whether the given email address matches a valid email format.
+// Returns true if the email is valid, false otherwise.
+func IsValidEmail(email string) bool {
+	return emailPattern.MatchString(email)
 }
 
-func GetDomain(addr string) string {
-	// Returns everything after the last "@"
-	return addr[strings.LastIndex(addr, "@")+1:]
-}
-
-func LocalPart(addr string) string {
-	return strings.Split(addr, "@")[0]
-}
-
-func MaskedEmail(e string, show int) string {
-	// Mask an email so only *show* chars of the local part remain visible
-	if !IsValid(e) {
-		return e
+// [AI GENERATED] LLM: GitHub Copilot, Mode: Chat, Date: 2025-12-15
+// GetEmailDomain extracts the domain part from an email address.
+// Returns an error if the email is invalid or doesn't contain "@".
+func GetEmailDomain(email string) (string, error) {
+	idx := strings.LastIndex(email, "@")
+	if idx == -1 {
+		return "", fmt.Errorf("invalid email: missing @")
 	}
-	parts := strings.Split(e, "@")
-	lp := parts[0]
-	dom := parts[1]
-	masked := lp[:show] + strings.Repeat("*", len(lp)-show)
-	return masked + "@" + dom
+	return email[idx+1:], nil
+}
+
+// [AI GENERATED] LLM: GitHub Copilot, Mode: Chat, Date: 2025-12-15
+// GetEmailLocalPart extracts the local part (before "@") from an email address.
+// Returns an error if the email doesn't contain "@".
+func GetEmailLocalPart(email string) (string, error) {
+	parts := strings.Split(email, "@")
+	if len(parts) != 2 {
+		return "", fmt.Errorf("invalid email format")
+	}
+	return parts[0], nil
+}
+
+// [AI GENERATED] LLM: GitHub Copilot, Mode: Chat, Date: 2025-12-15
+// MaskEmail masks an email address, showing only the first visibleChars
+// characters of the local part. Returns an error if the email is invalid
+// or if visibleChars is out of range.
+func MaskEmail(email string, visibleChars int) (string, error) {
+	if !IsValidEmail(email) {
+		return "", fmt.Errorf("invalid email format")
+	}
+	parts := strings.Split(email, "@")
+	localPart := parts[0]
+	domain := parts[1]
+	
+	if visibleChars < 0 || visibleChars > len(localPart) {
+		return "", fmt.Errorf("visibleChars must be between 0 and %d", len(localPart))
+	}
+	
+	masked := localPart[:visibleChars] + strings.Repeat("*", len(localPart)-visibleChars)
+	return masked + "@" + domain, nil
 }
 
 func main() {
 	email := "john.doe@example.com"
-	masked := MaskedEmail(email, 2)
+	masked, err := MaskEmail(email, 2)
+	if err != nil {
+		fmt.Printf("Error: %v\n", err)
+		return
+	}
 	fmt.Println(masked)
 }

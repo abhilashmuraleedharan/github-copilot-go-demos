@@ -1,20 +1,20 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+)
 
+// [AI GENERATED] LLM: GitHub Copilot, Mode: Chat, Date: 2025-12-15
 func HasTripletSum(nums []int, target int) bool {
-	i := 0
-	for i < len(nums) {
-		j := 0
-		for j < len(nums) {
-			k := 0
-			for k < len(nums) {
-				if nums[i]+nums[j]+nums[k] == target {
-					return true
+	for firstIdx := 0; firstIdx < len(nums); firstIdx++ {
+		for secondIdx := 0; secondIdx < len(nums); secondIdx++ {
+			for thirdIdx := 0; thirdIdx < len(nums); thirdIdx++ {
+				if firstIdx != secondIdx && secondIdx != thirdIdx && firstIdx != thirdIdx {
+					if nums[firstIdx]+nums[secondIdx]+nums[thirdIdx] == target {
+						return true
+					}
 				}
-				k++
 			}
-			j++
 		}
 	}
 	return false

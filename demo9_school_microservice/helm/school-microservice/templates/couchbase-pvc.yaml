@@ -1,0 +1,22 @@
+{{- /*
+[AI GENERATED] LLM: GitHub Copilot, Mode: Chat, Date: 2025-12-15
+*/ -}}
+{{- if and .Values.couchbase.enabled .Values.couchbase.persistence.enabled }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ .Values.couchbase.name }}-pvc
+  namespace: {{ .Values.namespace }}
+  labels:
+    {{- include "school-microservice.labels" . | nindent 4 }}
+    app.kubernetes.io/component: couchbase
+spec:
+  accessModes:
+    - ReadWriteOnce
+  {{- if .Values.couchbase.persistence.storageClass }}
+  storageClassName: {{ .Values.couchbase.persistence.storageClass }}
+  {{- end }}
+  resources:
+    requests:
+      storage: {{ .Values.couchbase.persistence.size }}
+{{- end }}

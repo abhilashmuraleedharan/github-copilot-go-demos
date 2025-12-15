@@ -1,0 +1,48 @@
+ingestion:
+  type: "http"
+  host: "0.0.0.0"
+  port: 8080
+  batch_size: 100
+  buffer_size: 1000
+
+enrichment:
+  enabled: true
+  lookup_sources:
+    - "location_db"
+    - "customer_db"
+  cache_size: 10000
+  cache_ttl: 3600
+  custom_fields:
+    region: "location.region"
+    customer_type: "customer.type"
+
+transformation:
+  date_format: "2006-01-02T15:04:05Z07:00"
+  time_zone: "UTC"
+  rules:
+    - field: "duration"
+      operation: "convert"
+      value: "seconds"
+    - field: "phone_number"
+      operation: "mask"
+      value: "last4"
+
+filtering:
+  enabled: true
+  action: "drop"
+  conditions:
+    - field: "duration"
+      operator: "less_than"
+      value: "0"
+    - field: "call_type"
+      operator: "equals"
+      value: "test"
+
+exporting:
+  type: "kafka"
+  destination: "localhost:9092"
+  format: "json"
+  batch_size: 50
+  flush_timeout: 5000
+  headers:
+    content-type: "application/json"

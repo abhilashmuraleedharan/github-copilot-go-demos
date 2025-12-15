@@ -1,0 +1,82 @@
+{{- /*
+[AI GENERATED] LLM: GitHub Copilot, Mode: Chat, Date: 2025-12-15
+*/ -}}
+{{- if .Values.couchbase.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.couchbase.name }}
+  namespace: {{ .Values.namespace }}
+  labels:
+    {{- include "school-microservice.labels" . | nindent 4 }}
+    app.kubernetes.io/component: couchbase
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: {{ .Values.couchbase.name }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.couchbase.name }}
+        {{- include "school-microservice.labels" . | nindent 8 }}
+    spec:
+      containers:
+      - name: couchbase
+        image: "{{ .Values.couchbase.image.repository }}:{{ .Values.couchbase.image.tag }}"
+        imagePullPolicy: {{ .Values.couchbase.image.pullPolicy }}
+        ports:
+        - name: console
+          containerPort: 8091
+          protocol: TCP
+        - name: api
+          containerPort: 8092
+          protocol: TCP
+        - name: query
+          containerPort: 8093
+          protocol: TCP
+        - name: search
+          containerPort: 8094
+          protocol: TCP
+        - name: analytics
+          containerPort: 8095
+          protocol: TCP
+        - name: eventing
+          containerPort: 8096
+          protocol: TCP
+        - name: client
+          containerPort: 11210
+          protocol: TCP
+        env:
+        - name: COUCHBASE_ADMINISTRATOR_USERNAME
+          valueFrom:
+            secretKeyRef:
+              name: couchbase-credentials
+              key: username
+        - name: COUCHBASE_ADMINISTRATOR_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: couchbase-credentials
+              key: password
+        {{- if .Values.couchbase.livenessProbe }}
+        livenessProbe:
+          {{- toYaml .Values.couchbase.livenessProbe | nindent 10 }}
+        {{- end }}
+        {{- if .Values.couchbase.readinessProbe }}
+        readinessProbe:
+          {{- toYaml .Values.couchbase.readinessProbe | nindent 10 }}
+        {{- end }}
+        resources:
+          {{- toYaml .Values.couchbase.resources | nindent 10 }}
+        {{- if .Values.couchbase.persistence.enabled }}
+        volumeMounts:
+        - name: couchbase-data
+          mountPath: /opt/couchbase/var
+        {{- end }}
+      {{- if .Values.couchbase.persistence.enabled }}
+      volumes:
+      - name: couchbase-data
+        persistentVolumeClaim:
+          claimName: {{ .Values.couchbase.name }}-pvc
+      {{- end }}
+{{- end }}

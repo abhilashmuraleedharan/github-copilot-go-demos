@@ -2,14 +2,53 @@
 
 ## Primary Prompt (Ask Mode)
 ```
-Need to generate a Go microservice that can handle operations of a school.
-Service should maintain list of students, teachers, classes, academics and achievements.
-This service will be accessed by the external services.
-Need to provide REST interfaces for CRUD operations.
-Need to build suitable logic for academics, exams, and achievements.
-Utilize Couchbase as the storage database.
-Expected traffic is about 200 tps in the peak hours 10 am to 5 pm.
-Provide me the details of possible approaches detailing each one's pros & cons.
+## SYSTEM ROLE
+You are a senior backend architect and system designer.
+You are NOT allowed to write code in this response.
+
+## TASK
+Analyze the problem and propose MULTIPLE ARCHITECTURAL APPROACHES
+for building a Go-based school management microservice.
+
+## IMPORTANT CONSTRAINTS (MUST FOLLOW)
+- ❌ DO NOT generate any code
+- ❌ DO NOT provide APIs, structs, or Go examples
+- ❌ DO NOT assume a final design
+- ✅ ONLY discuss design approaches and trade-offs
+- ✅ Provide at least 3 clearly distinct approaches
+- ✅ Each approach must have pros, cons, and when to use it
+
+## PROBLEM STATEMENT
+We need a Go microservice for school operations:
+- Manage students, teachers, classes, academics, exams, achievements
+- Exposed via REST APIs for CRUD
+- Uses Couchbase as the data store
+- Accessed by external services
+- Expected traffic: ~200 TPS during peak hours (10 AM – 5 PM)
+
+## REQUIRED OUTPUT FORMAT
+For EACH approach, strictly follow this format:
+
+### Approach <N>: <Approach Name>
+**Description**
+- High-level architecture
+- Data modeling philosophy
+- How academics, exams, achievements are handled
+
+**Pros**
+- Bullet points
+
+**Cons**
+- Bullet points
+
+**Best Fit When**
+- Bullet points
+
+## FINAL SECTION
+Add a short comparison table summarizing all approaches.
+
+## REMINDER
+If you write any code or API definitions, the response is invalid.
 ```
 
 ## Copilot Agent Mode

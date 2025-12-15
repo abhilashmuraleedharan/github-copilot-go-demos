@@ -1,0 +1,20 @@
+{{- /*
+[AI GENERATED] LLM: GitHub Copilot, Mode: Chat, Date: 2025-12-15
+*/ -}}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Values.schoolService.name }}
+  namespace: {{ .Values.namespace }}
+  labels:
+    {{- include "school-microservice.labels" . | nindent 4 }}
+    app.kubernetes.io/component: api
+spec:
+  type: {{ .Values.schoolService.service.type }}
+  selector:
+    app: {{ .Values.schoolService.name }}
+  ports:
+  - name: http
+    port: {{ .Values.schoolService.service.port }}
+    targetPort: {{ .Values.schoolService.service.targetPort }}
+    protocol: TCP

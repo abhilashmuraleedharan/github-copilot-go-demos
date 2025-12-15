@@ -1,0 +1,14 @@
+{{- /*
+[AI GENERATED] LLM: GitHub Copilot, Mode: Chat, Date: 2025-12-15
+*/ -}}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Values.schoolService.name }}-config
+  namespace: {{ .Values.namespace }}
+  labels:
+    {{- include "school-microservice.labels" . | nindent 4 }}
+data:
+  SERVER_PORT: {{ .Values.schoolService.env.serverPort | quote }}
+  COUCHBASE_CONNECTION_STRING: {{ .Values.schoolService.env.couchbaseConnectionString | quote }}
+  COUCHBASE_BUCKET: {{ .Values.schoolService.env.couchbaseBucket | quote }}

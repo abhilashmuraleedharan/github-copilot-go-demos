@@ -1,0 +1,82 @@
+{{- /*
+[AI GENERATED] LLM: GitHub Copilot, Mode: Chat, Date: 2025-12-15
+*/ -}}
+{{- if .Values.couchbase.enabled }}
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: couchbase-init
+  namespace: {{ .Values.namespace }}
+  labels:
+    {{- include "school-microservice.labels" . | nindent 4 }}
+    app.kubernetes.io/component: couchbase-init
+spec:
+  backoffLimit: 10
+  template:
+    metadata:
+      labels:
+        app: couchbase-init
+    spec:
+      restartPolicy: OnFailure
+      containers:
+      - name: init
+        image: curlimages/curl:latest
+        command:
+        - /bin/sh
+        - -c
+        - |
+          set -e
+          echo "Waiting for Couchbase to be ready..."
+          until curl -sf http://couchbase-service:8091/ui/index.html > /dev/null; do
+            echo "Waiting for Couchbase..."
+            sleep 5
+          done
+          echo "Couchbase is ready!"
+          
+          echo "Initializing cluster..."
+          curl -X POST http://couchbase-service:8091/clusterInit \
+            -d "clusterName=school-cluster" \
+            -d "hostname=couchbase-service" \
+            -d "dataPath=%2Fopt%2Fcouchbase%2Fvar%2Flib%2Fcouchbase%2Fdata" \
+            -d "indexPath=%2Fopt%2Fcouchbase%2Fvar%2Flib%2Fcouchbase%2Fdata" \
+            -d "eventingPath=%2Fopt%2Fcouchbase%2Fvar%2Flib%2Fcouchbase%2Fdata" \
+            -d "analyticsPath=%2Fopt%2Fcouchbase%2Fvar%2Flib%2Fcouchbase%2Fdata" \
+            -d "services=kv%2Cn1ql%2Cindex" \
+            -d "memoryQuota=256" \
+            -d "indexMemoryQuota=256" \
+            -d "port=8091" \
+            -d "username=${COUCHBASE_USERNAME}" \
+            -d "password=${COUCHBASE_PASSWORD}"
+          
+          echo "Waiting for services to initialize..."
+          sleep 10
+          
+          echo "Creating bucket..."
+          curl -X POST http://couchbase-service:8091/pools/default/buckets \
+            -u "${COUCHBASE_USERNAME}:${COUCHBASE_PASSWORD}" \
+            -d "name={{ .Values.couchbase.bucket.name }}" \
+            -d "ramQuotaMB={{ .Values.couchbase.bucket.ramQuotaMB }}" \
+            -d "bucketType=couchbase" \
+            -d "flushEnabled=1"
+          
+          echo "Waiting for bucket to be ready..."
+          sleep 10
+          
+          echo "Creating primary index..."
+          curl -X POST http://couchbase-service:8093/query/service \
+            -u "${COUCHBASE_USERNAME}:${COUCHBASE_PASSWORD}" \
+            -d "statement=CREATE PRIMARY INDEX ON \`{{ .Values.couchbase.bucket.name }}\`"
+          
+          echo "Couchbase initialization complete!"
+        env:
+        - name: COUCHBASE_USERNAME
+          valueFrom:
+            secretKeyRef:
+              name: couchbase-credentials
+              key: username
+        - name: COUCHBASE_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: couchbase-credentials
+              key: password
+{{- end }}

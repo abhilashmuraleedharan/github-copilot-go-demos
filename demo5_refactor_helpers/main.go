@@ -5,16 +5,30 @@ import (
 	"strings"
 )
 
+// [AI GENERATED] LLM: GitHub Copilot, Mode: Chat, Date: 2025-12-15
+// cleanText converts a line to lowercase and removes common punctuation.
+func cleanText(line string) string {
+	line = strings.ToLower(line)
+	line = strings.ReplaceAll(line, ",", "")
+	line = strings.ReplaceAll(line, ".", "")
+	return line
+}
+
+// [AI GENERATED] LLM: GitHub Copilot, Mode: Chat, Date: 2025-12-15
+// countTokens increments the count for each token in the provided map.
+func countTokens(tokens []string, counts map[string]int) {
+	for _, tok := range tokens {
+		counts[tok]++
+	}
+}
+
+// [AI GENERATED] LLM: GitHub Copilot, Mode: Chat, Date: 2025-12-15
 func ProcessTranscript(lines []string) map[string]int {
 	counts := make(map[string]int)
 	for _, line := range lines {
-		line = strings.ToLower(line)
-		line = strings.ReplaceAll(line, ",", "")
-		line = strings.ReplaceAll(line, ".", "")
-		tokens := strings.Fields(line)
-		for _, tok := range tokens {
-			counts[tok]++
-		}
+		cleanedLine := cleanText(line)
+		tokens := strings.Fields(cleanedLine)
+		countTokens(tokens, counts)
 	}
 
 	var mostCommon string

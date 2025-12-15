@@ -1,0 +1,77 @@
+# [AI GENERATED] LLM: GitHub Copilot, Mode: Chat, Date: 2025-12-15
+
+services:
+  # Couchbase Server
+  couchbase:
+    image: couchbase:community-7.2.4
+    container_name: school-couchbase
+    ports:
+      - "8091-8096:8091-8096"
+      - "11210:11210"
+    environment:
+      - CLUSTER_NAME=school-cluster
+    volumes:
+      - couchbase-data:/opt/couchbase/var
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8091/ui/index.html"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 40s
+
+  # Couchbase initialization container
+  couchbase-init:
+    image: couchbase:community-7.2.4
+    container_name: school-couchbase-init
+    depends_on:
+      couchbase:
+        condition: service_healthy
+    entrypoint: ["/bin/bash", "-c"]
+    command: 
+      - |
+        echo 'Waiting for Couchbase to be ready...'
+        sleep 10
+        
+        echo 'Initializing Couchbase cluster...'
+        couchbase-cli cluster-init -c couchbase:8091 --cluster-username Administrator --cluster-password password --cluster-name school-cluster --cluster-ramsize 512 --cluster-index-ramsize 256 --services data,index,query || true
+        
+        sleep 5
+        
+        echo 'Creating bucket...'
+        couchbase-cli bucket-create -c couchbase:8091 -u Administrator -p password --bucket school --bucket-type couchbase --bucket-ramsize 256 || true
+        
+        sleep 5
+        
+        echo 'Creating primary index...'
+        cbq -u Administrator -p password -e http://couchbase:8091 --script="CREATE PRIMARY INDEX ON \`school\`;" || true
+        
+        echo 'Couchbase initialization complete!'
+    restart: "no"
+
+  # School Management Microservice
+  school-service:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: school-service
+    ports:
+      - "8080:8080"
+    environment:
+      - SERVER_PORT=8080
+      - COUCHBASE_CONNECTION_STRING=couchbase://couchbase
+      - COUCHBASE_USERNAME=Administrator
+      - COUCHBASE_PASSWORD=password
+      - COUCHBASE_BUCKET=school
+    depends_on:
+      couchbase-init:
+        condition: service_completed_successfully
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:8080/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+volumes:
+  couchbase-data:
