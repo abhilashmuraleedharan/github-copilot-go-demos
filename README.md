@@ -17,6 +17,7 @@ This repository contains a set of guided demos to showcase how [GitHub Copilot a
 | **Demo 7** | Use `/new` to scaffold a Go web API project from scratch |
 | **Demo 8** | Analyze telecom system specification for CDR Transformation Microservice and collaborate with Copilot to extract requirements, design modules, and define interfaces |
 | **Demo 9** | Use Copilot to help you ideate, scaffold, and evolve an entire microservice from scratch — including logic, deployment, and documentation|
+| **Demo 10** | Use Plan Mode to architect a 5G CDR Pipeline microservice |
 
 ---
 
